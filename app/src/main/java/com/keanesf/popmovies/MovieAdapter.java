@@ -7,6 +7,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
@@ -15,19 +16,42 @@ import java.util.List;
 
 public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieAdapterViewHolder> {
 
-    private final Context context;
-    private final LayoutInflater inflater;
     private List<Movie> movies;
 
-    public MovieAdapter(Activity context, List<Movie> myMovies) {
-        this.context = context;
-        inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        movies = myMovies;
+    private final MovieAdapterOnClickHandler mClickHandler;
+
+    public interface MovieAdapterOnClickHandler {
+        void onClick(Movie movie);
+    }
+
+    public MovieAdapter(MovieAdapterOnClickHandler clickHandler) {
+        mClickHandler = clickHandler;
     }
 
     @Override
-    public Movie getItem(int position) {
-        return movies.get(position);
+    public int getItemCount() {
+        if (null == movies) return 0;
+        return movies.size();
+    }
+
+    @Override
+    public MovieAdapterViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
+        Context context = viewGroup.getContext();
+        int layoutIdForListItem = R.layout.grid_item_movie;
+        LayoutInflater inflater = LayoutInflater.from(context);
+        boolean shouldAttachToParentImmediately = false;
+
+        View view = inflater.inflate(layoutIdForListItem, viewGroup, shouldAttachToParentImmediately);
+        return new MovieAdapterViewHolder(view);
+    }
+
+    @Override
+    public void onBindViewHolder(MovieAdapterViewHolder movieAdapterViewHolder, int position) {
+        Movie movie = movies.get(position);
+
+        String imageUrl = "http://image.tmdb.org/t/p/w185" + movie.getPosterPath();
+
+        Picasso.with(movieAdapterViewHolder.movieImageView.getContext()).load(imageUrl).into(movieAdapterViewHolder.movieImageView);
     }
 
     @Override
@@ -35,56 +59,12 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieAdapter
         return position;
     }
 
-    @Override
-    public int getCount() {
-        return movies.size();
-    }
-
-
-    @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
-
-        View view = convertView;
-        RecyclerView.ViewHolder viewHolder;
-
-        if (view == null) {
-            view = inflater.inflate(R.layout.grid_item_movie, parent, false);
-            viewHolder = new RecyclerView.ViewHolder(view);
-            view.setTag(viewHolder);
-        }
-
-        final Movie movie = getItem(position);
-
-        String imageUrl = "http://image.tmdb.org/t/p/w185" + movie.getPosterPath();
-
-        viewHolder = (RecyclerView.ViewHolder) view.getTag();
-
-        Picasso.with(getContext()).load(imageUrl).into(viewHolder.);
-
-        // Adapters recycle views to AdapterViews.
-        // If this is a new View object we're getting, then inflate the layout.
-        // If not, this view already has the layout inflated from a previous call to getView,
-        // and we modify the View widgets as usual.
-        if (convertView == null) {
-            convertView = LayoutInflater.from(getContext()).inflate(R.layout.grid_item_movie, parent, false);
-        }
-
-        return convertView;
-    }
-
-    public void setData(List<Movie> data) {
-        clear();
-        for (Movie movie : data) {
-            add(movie);
-        }
-    }
-
     public class MovieAdapterViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
-        public final TextView mWeatherTextView;
+        public final ImageView movieImageView;
 
         public MovieAdapterViewHolder(View view) {
             super(view);
-            mWeatherTextView = (TextView) view.findViewById(R.layout.grid_item_movie);
+            movieImageView = (ImageView) view.findViewById(R.id.grid_item_image);
             view.setOnClickListener(this);
         }
 
@@ -97,8 +77,12 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieAdapter
         @Override
         public void onClick(View v) {
             int adapterPosition = getAdapterPosition();
-            String weatherForDay = mWeatherData[adapterPosition];
-            mClickHandler.onClick(weatherForDay);
+            Movie movie = movies.get(adapterPosition);
+            mClickHandler.onClick(movie);
         }
+    }
+
+    public void setMovies(List<Movie> movies) {
+        this.movies = movies;
     }
 }

@@ -16,6 +16,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.keanesf.popmovies.utilities.MovieDbService;
 
@@ -25,7 +26,7 @@ import java.util.List;
 
 import retrofit2.Call;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements MovieAdapter.MovieAdapterOnClickHandler {
 
     private RecyclerView recyclerView;
     private MovieAdapter movieAdapter;
@@ -44,11 +45,12 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        mErrorMessageDisplay = (TextView) findViewById(R.id.tv_error_message_display);
+
         recyclerView = (RecyclerView) findViewById(R.id.rvMovies);
         recyclerView.setLayoutManager(new GridLayoutManager(this, 2));
 
-        movieAdapter = new MovieAdapter();
-        movieAdapter.
+        movieAdapter = new MovieAdapter(this);
 
         recyclerView.setAdapter(movieAdapter);
 
@@ -166,6 +168,12 @@ public class MainActivity extends AppCompatActivity {
         private final String LOG_TAG = FetchMoviesTask.class.getSimpleName();
 
         @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            mLoadingIndicator.setVisibility(View.VISIBLE);
+        }
+
+        @Override
         protected List<Movie> doInBackground(String... params) {
 
             if (params.length == 0) {
@@ -194,13 +202,24 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         protected void onPostExecute(List<Movie> movies) {
+            mLoadingIndicator.setVisibility(View.INVISIBLE);
             if (movies != null) {
                 if (movieAdapter != null) {
-                    movieAdapter.setData(movies);
+                    showMovieDataView();
+                    movieAdapter.setMovies(movies);
                 }
-                movies = new ArrayList<>();
-                movies.addAll(movies);
+                else {
+                    showErrorMessage();
+                }
             }
         }
+    }
+
+    @Override
+    public void onClick(Movie movie) {
+        Context context = this;
+        //FIXME this is temporary
+        Toast.makeText(context, movie.getTitle(), Toast.LENGTH_SHORT)
+                .show();
     }
 }
