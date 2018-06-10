@@ -25,7 +25,7 @@ public class DetailActivityFragment extends android.support.v4.app.Fragment {
     private ScrollView detailLayout;
     private ImageView imageView;
     private TextView titleView;
-    private TextView overView;
+    private TextView overviewView;
     private TextView dateView;
     private TextView voteAverageView;
 
@@ -56,35 +56,9 @@ public class DetailActivityFragment extends android.support.v4.app.Fragment {
             detailLayout.setVisibility(View.INVISIBLE);
         }
 
-        imageView = (ImageView) rootView.findViewById(R.id.detail_image);
 
-        titleView = (TextView) rootView.findViewById(R.id.detail_title);
-        overView = (TextView) rootView.findViewById(R.id.detail_overview);
-        dateView = (TextView) rootView.findViewById(R.id.detail_date);
-        voteAverageView = (TextView) rootView.findViewById(R.id.detail_vote_average);
 
-        if (movie != null) {
 
-            String imageUrl = "http://image.tmdb.org/t/p/w185" + movie.getPosterPath();
-
-            // todo need to fix this
-            //Picasso.with(this).load(imageUrl).into(imageView);
-
-            titleView.setText(movie.getTitle());
-            overView.setText(movie.getOverview());
-
-            String movie_date = movie.getReleaseDate();
-
-            SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
-            try {
-                String date = DateUtils.formatDateTime(getActivity(), formatter.parse(movie_date).getTime(), DateUtils.FORMAT_SHOW_DATE | DateUtils.FORMAT_SHOW_YEAR);
-                dateView.setText(date);
-            } catch (java.text.ParseException e) {
-                e.printStackTrace();
-            }
-
-            voteAverageView.setText(Double.toString(movie.getVoteAverage()));
-        }
 
         return rootView;
     }

@@ -129,15 +129,20 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
     }
 
     private void loadMovieData(String sortBy){
-        showMovieDataView();
+        if(isOnline()){
+            showMovieDataView();
+            new FetchMoviesTask().execute(sortBy);
+        }
+        else {
+            mErrorMessageDisplay.setVisibility(View.VISIBLE);
+        }
 
-        new FetchMoviesTask().execute(sortBy);
     }
 
     private void showMovieDataView() {
         /* First, make sure the error is invisible */
         mErrorMessageDisplay.setVisibility(View.INVISIBLE);
-        /* Then, make sure the weather data is visible */
+        /* Then, make sure the movie data is visible */
         recyclerView.setVisibility(View.VISIBLE);
     }
 
@@ -154,7 +159,6 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
         /* Then, show the error */
         mErrorMessageDisplay.setVisibility(View.VISIBLE);
     }
-
 
     public boolean isOnline() {
         ConnectivityManager cm =
@@ -217,9 +221,13 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
 
     @Override
     public void onClick(Movie movie) {
-        Context context = this;
+        // Context context = this;
         //FIXME this is temporary
-        Toast.makeText(context, movie.getTitle(), Toast.LENGTH_SHORT)
-                .show();
+//        Toast.makeText(context, movie.getTitle(), Toast.LENGTH_SHORT)
+//                .show();
+
+        Intent movieDetailIntent = new Intent(MainActivity.this, DetailActivity.class);
+        movieDetailIntent.putExtra("movie", movie);
+        startActivity(movieDetailIntent);
     }
 }
