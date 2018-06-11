@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.text.format.DateUtils;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.ScrollView;
 import android.widget.TextView;
@@ -32,12 +33,15 @@ public class DetailActivity extends AppCompatActivity {
         overviewView = (TextView) findViewById(R.id.detail_overview);
         dateView = (TextView) findViewById(R.id.detail_date);
         voteAverageView = (TextView) findViewById(R.id.detail_vote_average);
+        detailLayout = (ScrollView) findViewById(R.id.detail_layout);
 
         Intent intentThatStartedThisActivity = getIntent();
 
         if (intentThatStartedThisActivity != null) {
             Movie movie = intentThatStartedThisActivity.getParcelableExtra("movie");
             if (movie != null) {
+
+                detailLayout.setVisibility(View.VISIBLE);
 
                 String imageUrl = "http://image.tmdb.org/t/p/w185" + movie.getPosterPath();
 
@@ -57,6 +61,9 @@ public class DetailActivity extends AppCompatActivity {
                 }
 
                 voteAverageView.setText(Double.toString(movie.getVoteAverage()));
+            }
+            else {
+                detailLayout.setVisibility(View.INVISIBLE);
             }
         }
     }
