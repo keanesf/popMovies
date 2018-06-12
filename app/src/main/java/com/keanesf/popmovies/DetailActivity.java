@@ -15,7 +15,6 @@ import java.text.SimpleDateFormat;
 
 public class DetailActivity extends AppCompatActivity {
 
-    private Movie movie;
     private ScrollView detailLayout;
     private ImageView imageView;
     private TextView titleView;
