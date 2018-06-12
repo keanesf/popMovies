@@ -59,7 +59,7 @@ public class DetailActivity extends AppCompatActivity {
                     e.printStackTrace();
                 }
 
-                voteAverageView.setText(Double.toString(movie.getVoteAverage()));
+                voteAverageView.setText(movie.getVoteAverage() + "/10");
             }
             else {
                 detailLayout.setVisibility(View.INVISIBLE);
