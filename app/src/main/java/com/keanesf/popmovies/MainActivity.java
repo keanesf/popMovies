@@ -221,11 +221,6 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
 
     @Override
     public void onClick(Movie movie) {
-        // Context context = this;
-        //FIXME this is temporary
-//        Toast.makeText(context, movie.getTitle(), Toast.LENGTH_SHORT)
-//                .show();
-
         Intent movieDetailIntent = new Intent(MainActivity.this, DetailActivity.class);
         movieDetailIntent.putExtra("movie", movie);
         startActivity(movieDetailIntent);
