@@ -192,7 +192,7 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
                     return apiCall.execute().body().getResults();
 
                 } else if (RATING_DESC.equals(params[0])) {
-                    Call<TmdbResponse<Movie>> apiCall = movieDbService.listPopMovies(BuildConfig.API_KEY);
+                    Call<TmdbResponse<Movie>> apiCall = movieDbService.listTopMovies(BuildConfig.API_KEY);
                     return apiCall.execute().body().getResults();
                 } else {
                     return null;
