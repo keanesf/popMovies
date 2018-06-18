@@ -1,4 +1,4 @@
-package com.keanesf.popmovies;
+package com.keanesf.popmovies.ui;
 
 import android.content.Context;
 import android.content.Intent;
@@ -16,9 +16,13 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.keanesf.popmovies.utilities.MovieDbService;
+import com.keanesf.popmovies.BuildConfig;
+import com.keanesf.popmovies.utilities.MovieAdapter;
+import com.keanesf.popmovies.R;
+import com.keanesf.popmovies.models.Movie;
+import com.keanesf.popmovies.models.TmdbResponse;
+import com.keanesf.popmovies.utilities.MovieDbDbService;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -112,6 +116,14 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
                 sortBy = RATING_DESC;
                 loadMovieData(sortBy);
                 return true;
+            case R.id.action_favorites:
+                if (item.isChecked()) {
+                    item.setChecked(false);
+                } else {
+                    item.setChecked(true);
+                }
+                loadFavoriteData();
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -137,6 +149,11 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
             mErrorMessageDisplay.setVisibility(View.VISIBLE);
         }
 
+    }
+
+    private void loadFavoriteData(){
+        // todo get favorites from the data base
+        mErrorMessageDisplay.setVisibility(View.VISIBLE);
     }
 
     private void showMovieDataView() {
@@ -184,7 +201,7 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
                 return null;
             }
 
-            MovieDbService movieDbService = MovieDbService.retrofit.create(MovieDbService.class);
+            MovieDbDbService movieDbService = MovieDbDbService.retrofit.create(MovieDbDbService.class);
 
             try {
                 if (POPULARITY_DESC.equals(params[0])) {

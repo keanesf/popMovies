@@ -1,14 +1,19 @@
-package com.keanesf.popmovies;
+package com.keanesf.popmovies.ui;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.text.format.DateUtils;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ScrollView;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.keanesf.popmovies.R;
+import com.keanesf.popmovies.models.Movie;
 import com.squareup.picasso.Picasso;
 
 import java.text.SimpleDateFormat;
@@ -33,6 +38,19 @@ public class DetailActivity extends AppCompatActivity {
         dateView = (TextView) findViewById(R.id.detail_date);
         voteAverageView = (TextView) findViewById(R.id.detail_vote_average);
         detailLayout = (ScrollView) findViewById(R.id.detail_layout);
+
+        final Button button = findViewById(R.id.button_id);
+        button.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                // Code here executes on main thread after user presses button
+                Context context = getApplicationContext();
+                CharSequence text = "Hello toast!";
+                int duration = Toast.LENGTH_SHORT;
+
+                Toast toast = Toast.makeText(context, text, duration);
+                toast.show();
+            }
+        });
 
         Intent intentThatStartedThisActivity = getIntent();
 

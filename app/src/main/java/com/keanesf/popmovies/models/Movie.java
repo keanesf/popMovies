@@ -1,4 +1,4 @@
-package com.keanesf.popmovies;
+package com.keanesf.popmovies.models;
 
 import android.os.Parcel;
 import android.os.Parcelable;
