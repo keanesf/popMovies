@@ -1,5 +1,6 @@
 package com.keanesf.popmovies.ui;
 
+import android.arch.persistence.room.Room;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -13,6 +14,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.keanesf.popmovies.R;
+import com.keanesf.popmovies.data.database.FavoriteEntry;
+import com.keanesf.popmovies.data.database.PopMoviesDatabase;
 import com.keanesf.popmovies.models.Movie;
 import com.squareup.picasso.Picasso;
 
@@ -26,6 +29,7 @@ public class DetailActivity extends AppCompatActivity {
     private TextView overviewView;
     private TextView dateView;
     private TextView voteAverageView;
+    private PopMoviesDatabase popMoviesDatabase;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,23 +43,14 @@ public class DetailActivity extends AppCompatActivity {
         voteAverageView = (TextView) findViewById(R.id.detail_vote_average);
         detailLayout = (ScrollView) findViewById(R.id.detail_layout);
 
-        final Button button = findViewById(R.id.button_id);
-        button.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                // Code here executes on main thread after user presses button
-                Context context = getApplicationContext();
-                CharSequence text = "Hello toast!";
-                int duration = Toast.LENGTH_SHORT;
+        popMoviesDatabase = Room.databaseBuilder(getApplicationContext(),
+                PopMoviesDatabase.class, "popMovie-db").build();
 
-                Toast toast = Toast.makeText(context, text, duration);
-                toast.show();
-            }
-        });
 
         Intent intentThatStartedThisActivity = getIntent();
 
         if (intentThatStartedThisActivity != null) {
-            Movie movie = intentThatStartedThisActivity.getParcelableExtra("movie");
+            final Movie movie = intentThatStartedThisActivity.getParcelableExtra("movie");
             if (movie != null) {
 
                 detailLayout.setVisibility(View.VISIBLE);
@@ -78,6 +73,30 @@ public class DetailActivity extends AppCompatActivity {
                 }
 
                 voteAverageView.setText(movie.getVoteAverage() + "/10");
+
+                final Button button = findViewById(R.id.button_id);
+                button.setOnClickListener(new View.OnClickListener() {
+                    public void onClick(View v) {
+                        final FavoriteEntry favoriteEntry = new FavoriteEntry(movie.getId());
+                        AppExecutors.getInstance().diskIO().execute(new Runnable() {
+                            @Override
+                            public void run() {
+                                popMoviesDatabase.favoriteDao().insert(favoriteEntry);
+                                finish();
+                            }
+                        });
+
+
+                        // Code here executes on main thread after user presses button
+                        Context context = getApplicationContext();
+                        CharSequence text = "Favorite saved!";
+                        int duration = Toast.LENGTH_SHORT;
+
+                        Toast toast = Toast.makeText(context, text, duration);
+                        toast.show();
+                    }
+                });
+
             }
             else {
                 detailLayout.setVisibility(View.INVISIBLE);
