@@ -29,7 +29,7 @@ import android.util.Log;
  */
 
 // List of the entry classes and associated TypeConverters
-@Database(entities = {FavoriteEntry.class}, version = 1)
+@Database(entities = {FavoriteEntry.class}, version = 2)
 public abstract class PopMoviesDatabase extends RoomDatabase {
 
     private static final String LOG_TAG = PopMoviesDatabase.class.getSimpleName();
@@ -44,7 +44,9 @@ public abstract class PopMoviesDatabase extends RoomDatabase {
         if (sInstance == null) {
             synchronized (LOCK) {
                 sInstance = Room.databaseBuilder(context.getApplicationContext(),
-                        PopMoviesDatabase.class, PopMoviesDatabase.DATABASE_NAME).build();
+                        PopMoviesDatabase.class, PopMoviesDatabase.DATABASE_NAME)
+                        .fallbackToDestructiveMigration()
+                        .build();
                 Log.d(LOG_TAG, "Made new database");
             }
         }

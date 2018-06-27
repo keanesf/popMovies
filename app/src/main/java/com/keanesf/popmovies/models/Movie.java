@@ -63,6 +63,11 @@ public class Movie implements Parcelable {
         }
     };
 
+    public Movie(Long id, String posterPath){
+        this.id = id;
+        this.posterPath = posterPath;
+    }
+
     protected Movie(Parcel in) {
         this.voteCount = in.readLong();
         this.id = in.readLong();

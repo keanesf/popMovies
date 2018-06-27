@@ -43,8 +43,7 @@ public class DetailActivity extends AppCompatActivity {
         voteAverageView = (TextView) findViewById(R.id.detail_vote_average);
         detailLayout = (ScrollView) findViewById(R.id.detail_layout);
 
-        popMoviesDatabase = Room.databaseBuilder(getApplicationContext(),
-                PopMoviesDatabase.class, "popMovie-db").build();
+        popMoviesDatabase = PopMoviesDatabase.getInstance(this);
 
 
         Intent intentThatStartedThisActivity = getIntent();
@@ -77,7 +76,8 @@ public class DetailActivity extends AppCompatActivity {
                 final Button button = findViewById(R.id.button_id);
                 button.setOnClickListener(new View.OnClickListener() {
                     public void onClick(View v) {
-                        final FavoriteEntry favoriteEntry = new FavoriteEntry(movie.getId());
+                        final FavoriteEntry favoriteEntry = new FavoriteEntry(
+                                movie.getId(), movie.getPosterPath());
                         AppExecutors.getInstance().diskIO().execute(new Runnable() {
                             @Override
                             public void run() {

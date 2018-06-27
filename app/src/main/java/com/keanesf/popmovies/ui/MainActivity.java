@@ -1,5 +1,6 @@
 package com.keanesf.popmovies.ui;
 
+import android.arch.persistence.room.Room;
 import android.content.Context;
 import android.content.Intent;
 import android.net.ConnectivityManager;
@@ -18,6 +19,8 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.keanesf.popmovies.BuildConfig;
+import com.keanesf.popmovies.data.database.FavoriteEntry;
+import com.keanesf.popmovies.data.database.PopMoviesDatabase;
 import com.keanesf.popmovies.utilities.MovieAdapter;
 import com.keanesf.popmovies.R;
 import com.keanesf.popmovies.models.Movie;
@@ -40,14 +43,18 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
 
     private static final String POPULARITY_DESC = "popularity.desc";
     private static final String RATING_DESC = "vote_average.desc";
+    private static final String FAVORITE_DESC = "favorite.desc";
     private static final String SORT_SETTING_KEY = "sort_setting";
     private static final String MOVIES_KEY = "movies";
     private String sortBy = POPULARITY_DESC;
+    private PopMoviesDatabase popMoviesDatabase;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        popMoviesDatabase = PopMoviesDatabase.getInstance(this);
 
         mErrorMessageDisplay = (TextView) findViewById(R.id.tv_error_message_display);
 
@@ -122,7 +129,8 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
                 } else {
                     item.setChecked(true);
                 }
-                loadFavoriteData();
+                sortBy = FAVORITE_DESC;
+                loadMovieData(sortBy);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -149,11 +157,6 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
             mErrorMessageDisplay.setVisibility(View.VISIBLE);
         }
 
-    }
-
-    private void loadFavoriteData(){
-        // todo get favorites from the data base
-        mErrorMessageDisplay.setVisibility(View.VISIBLE);
     }
 
     private void showMovieDataView() {
@@ -211,7 +214,17 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
                 } else if (RATING_DESC.equals(params[0])) {
                     Call<TmdbResponse<Movie>> apiCall = movieDbService.listTopMovies(BuildConfig.API_KEY);
                     return apiCall.execute().body().getResults();
-                } else {
+                } else if (FAVORITE_DESC.equals(params[0])){
+                    List<FavoriteEntry> favoriteEntries = popMoviesDatabase.favoriteDao().getAll();
+                    List<Movie> movies = new ArrayList<>();
+                    // convert favorites to movies
+                    for(FavoriteEntry favoriteEntry: favoriteEntries){
+                        Movie movie = new Movie(favoriteEntry.getId(), favoriteEntry.getPosterPath());
+                        movies.add(movie);
+                    }
+                    return movies;
+                }
+                else {
                     return null;
                 }
             } catch (IOException e) {

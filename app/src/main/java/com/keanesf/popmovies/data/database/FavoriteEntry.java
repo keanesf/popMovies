@@ -19,9 +19,12 @@ public class FavoriteEntry {
     @PrimaryKey
     private Long id;
 
+    private String posterPath;
+
     // Constructor used by Room to create FavoriteEntries
-    public FavoriteEntry(Long id) {
+    public FavoriteEntry(Long id, String posterPath) {
         this.id = id;
+        this.posterPath = posterPath;
     }
 
     public Long getId() {
@@ -30,5 +33,13 @@ public class FavoriteEntry {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public String getPosterPath() {
+        return posterPath;
+    }
+
+    public void setPosterPath(String posterPath) {
+        this.posterPath = posterPath;
     }
 }
