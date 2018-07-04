@@ -25,18 +25,25 @@ public class Trailer implements Parcelable {
 
     @SerializedName("id")
     private String videoId;
+
     @SerializedName("iso_639_1")
     private String languageCode;
+
     @SerializedName("iso_3166_1")
     private String countryCode;
+
     @SerializedName("key")
     private String key;
+
     @SerializedName("name")
     private String name;
+
     @SerializedName("site")
     private String site;
+
     @SerializedName("size")
     private int size;
+
     @SerializedName("type")
     private String type;
 

@@ -1,6 +1,5 @@
 package com.keanesf.popmovies.ui;
 
-import android.arch.persistence.room.Room;
 import android.content.Context;
 import android.content.Intent;
 import android.net.ConnectivityManager;
@@ -25,7 +24,7 @@ import com.keanesf.popmovies.utilities.MovieAdapter;
 import com.keanesf.popmovies.R;
 import com.keanesf.popmovies.models.Movie;
 import com.keanesf.popmovies.models.TmdbResponse;
-import com.keanesf.popmovies.utilities.MovieDbDbService;
+import com.keanesf.popmovies.utilities.MovieService;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -204,7 +203,7 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
                 return null;
             }
 
-            MovieDbDbService movieDbService = MovieDbDbService.retrofit.create(MovieDbDbService.class);
+            MovieService movieDbService = MovieService.retrofit.create(MovieService.class);
 
             try {
                 if (POPULARITY_DESC.equals(params[0])) {
