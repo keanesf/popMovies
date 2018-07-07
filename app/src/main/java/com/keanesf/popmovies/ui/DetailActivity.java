@@ -3,9 +3,13 @@ package com.keanesf.popmovies.ui;
 import android.arch.persistence.room.Room;
 import android.content.Context;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.text.format.DateUtils;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -13,13 +17,22 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.keanesf.popmovies.BuildConfig;
 import com.keanesf.popmovies.R;
 import com.keanesf.popmovies.data.database.FavoriteEntry;
 import com.keanesf.popmovies.data.database.PopMoviesDatabase;
 import com.keanesf.popmovies.models.Movie;
+import com.keanesf.popmovies.models.Review;
+import com.keanesf.popmovies.models.TmdbResponse;
+import com.keanesf.popmovies.utilities.ReviewAdapter;
+import com.keanesf.popmovies.utilities.ReviewService;
 import com.squareup.picasso.Picasso;
 
+import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.List;
+
+import retrofit2.Call;
 
 public class DetailActivity extends AppCompatActivity {
 
@@ -30,6 +43,8 @@ public class DetailActivity extends AppCompatActivity {
     private TextView dateView;
     private TextView voteAverageView;
     private PopMoviesDatabase popMoviesDatabase;
+    private RecyclerView reviewRecyclerView;
+    private ReviewAdapter reviewAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -97,9 +112,57 @@ public class DetailActivity extends AppCompatActivity {
                     }
                 });
 
+                reviewRecyclerView = (RecyclerView) findViewById(R.id.reviewRecyclerView);
+
+                LinearLayoutManager layoutManager = new LinearLayoutManager(this);
+                reviewRecyclerView.setLayoutManager(layoutManager);
+
+                reviewAdapter = new ReviewAdapter();
+                reviewRecyclerView.setAdapter(reviewAdapter);
+
+                loadReviewData(movie.getId());
+
             }
             else {
                 detailLayout.setVisibility(View.INVISIBLE);
+            }
+        }
+    }
+
+    private void loadReviewData(Long movieId){
+        new FetchReviewsTask().execute(movieId.toString());
+    }
+
+    public class FetchReviewsTask extends AsyncTask<String, Void, List<Review>> {
+
+        private final String LOG_TAG = FetchReviewsTask.class.getSimpleName();
+
+        @Override
+        protected List<Review> doInBackground(String... params) {
+
+            if (params.length == 0) {
+                return null;
+            }
+
+            ReviewService reviewService = ReviewService.retrofit.create(ReviewService.class);
+
+
+            try {
+                Call<TmdbResponse<Review>> apiCall = reviewService.getReviews(params[0], BuildConfig.API_KEY);
+                return apiCall.execute().body().getResults();
+            } catch (IOException e) {
+                Log.e(LOG_TAG, "Error ", e);
+                return null;
+            }
+
+        }
+
+        @Override
+        protected void onPostExecute(List<Review> reviews) {
+            if (reviews != null) {
+                if (reviewAdapter != null) {
+                    reviewAdapter.setReviews(reviews);
+                }
             }
         }
     }

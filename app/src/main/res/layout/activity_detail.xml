@@ -80,6 +80,30 @@
 
         </LinearLayout>
 
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/trailerRecyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center" />
+
+        <TextView
+            android:id="@+id/reviewHeaderTextView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/trailerRecyclerView"
+            android:layout_marginLeft="24dp"
+            android:layout_marginRight="24dp"
+            android:paddingBottom="24dp"
+            android:text="@string/reviews"
+            android:textAllCaps="true"/>
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/reviewRecyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/reviewHeaderTextView"
+            android:paddingBottom="64dp"/>
+
     </LinearLayout>
 
 </ScrollView>

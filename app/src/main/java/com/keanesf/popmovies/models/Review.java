@@ -20,30 +20,30 @@ public class Review implements Parcelable {
     };
 
     @SerializedName("id")
-    private String reviewId;
+    private String id;
 
     @SerializedName("author")
     private String author;
 
     @SerializedName("url")
-    private String reviewUrl;
+    private String url;
 
     @SerializedName("content")
     private String content;
 
     public Review(String reviewId) {
-        this.reviewId = reviewId;
+        this.id = reviewId;
     }
 
     protected Review(Parcel in) {
-        this.reviewId = in.readString();
+        this.id = in.readString();
         this.author = in.readString();
-        this.reviewUrl = in.readString();
+        this.url = in.readString();
         this.content = in.readString();
     }
 
-    public String getReviewId() {
-        return reviewId;
+    public String getId() {
+        return id;
     }
 
     public String getAuthor() {
@@ -54,12 +54,12 @@ public class Review implements Parcelable {
         this.author = author;
     }
 
-    public String getReviewUrl() {
-        return reviewUrl;
+    public String getUrl() {
+        return url;
     }
 
-    public void setReviewUrl(String reviewUrl) {
-        this.reviewUrl = reviewUrl;
+    public void setUrl(String reviewUrl) {
+        this.url = reviewUrl;
     }
 
     public String getContent() {
@@ -79,9 +79,9 @@ public class Review implements Parcelable {
 
         Review review = (Review) o;
 
-        if (reviewId != null ? !reviewId.equals(review.reviewId) : review.reviewId != null) return false;
+        if (id != null ? !id.equals(review.id) : review.id != null) return false;
         if (author != null ? !author.equals(review.author) : review.author != null) return false;
-        if (reviewUrl != null ? !reviewUrl.equals(review.reviewUrl) : review.reviewUrl != null) return false;
+        if (url != null ? !url.equals(review.url) : review.url != null) return false;
         return content != null ? content.equals(review.content) : review.content == null;
 
     }
@@ -89,9 +89,9 @@ public class Review implements Parcelable {
     @Override
     @SuppressWarnings("PMD")
     public int hashCode() {
-        int result = reviewId != null ? reviewId.hashCode() : 0;
+        int result = id != null ? id.hashCode() : 0;
         result = 31 * result + (author != null ? author.hashCode() : 0);
-        result = 31 * result + (reviewUrl != null ? reviewUrl.hashCode() : 0);
+        result = 31 * result + (url != null ? url.hashCode() : 0);
         result = 31 * result + (content != null ? content.hashCode() : 0);
         return result;
     }
@@ -104,9 +104,9 @@ public class Review implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeString(this.reviewId);
+        dest.writeString(this.id);
         dest.writeString(this.author);
-        dest.writeString(this.reviewUrl);
+        dest.writeString(this.url);
         dest.writeString(this.content);
     }
 }
