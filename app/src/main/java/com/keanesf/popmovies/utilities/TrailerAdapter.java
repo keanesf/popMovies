@@ -1,23 +1,30 @@
 package com.keanesf.popmovies.utilities;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 
 import com.keanesf.popmovies.R;
 import com.keanesf.popmovies.models.Trailer;
+import com.squareup.picasso.Picasso;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class TrailerAdapter extends RecyclerView.Adapter<TrailerAdapter.TrailerAdapterViewHolder> {
 
-    private List<Trailer> trailers;
+    private List<String> trailers;
 
     private final TrailerAdapterOnClickHandler trailerAdapterOnClickHandler;
 
     public TrailerAdapter(TrailerAdapterOnClickHandler clickHandler){trailerAdapterOnClickHandler = clickHandler;}
+
+    private final String LOG_TAG = this.getClass().getSimpleName();
 
     @Override
     public int getItemCount() {
@@ -28,8 +35,7 @@ public class TrailerAdapter extends RecyclerView.Adapter<TrailerAdapter.TrailerA
     @Override
     public TrailerAdapterViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
         Context context = viewGroup.getContext();
-        // fixme this is wrong
-        int layoutIdForListItem = R.layout.grid_item_movie;
+        int layoutIdForListItem = R.layout.item_trailer;
         LayoutInflater inflater = LayoutInflater.from(context);
         boolean shouldAttachToParentImmediately = false;
 
@@ -38,24 +44,32 @@ public class TrailerAdapter extends RecyclerView.Adapter<TrailerAdapter.TrailerA
     }
 
     @Override
-    public void onBindViewHolder(TrailerAdapterViewHolder movieAdapterViewHolder, int position) {
-        Trailer movie = trailers.get(position);
+    public void onBindViewHolder(TrailerAdapterViewHolder trailerAdapterViewHolder, int position) {
+        String trailer = trailers.get(position);
 
-        //String imageUrl = "http://image.tmdb.org/t/p/w185" + movie.getPosterPath();
+        final Context context = trailerAdapterViewHolder.trailerImageView.getContext();
 
-        //Picasso.with(movieAdapterViewHolder.movieImageView.getContext()).load(imageUrl).into(movieAdapterViewHolder.movieImageView);
+        String thumbnailUrl = "http://img.youtube.com/vi/" + trailer  + "/0.jpg";
+
+
+        Picasso.with(context)
+                .load(thumbnailUrl)
+                .config(Bitmap.Config.RGB_565)
+                .into(trailerAdapterViewHolder.trailerImageView);
     }
 
 
     public interface TrailerAdapterOnClickHandler {
-        void onClick(Trailer trailer);
+        void onClick(String trailer);
     }
 
     public class TrailerAdapterViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
+        public final ImageView trailerImageView;
 
         public TrailerAdapterViewHolder(View view) {
             super(view);
+            trailerImageView = (ImageView) view.findViewById(R.id.trailer_thumbnail);
             view.setOnClickListener(this);
         }
 
@@ -67,8 +81,17 @@ public class TrailerAdapter extends RecyclerView.Adapter<TrailerAdapter.TrailerA
         @Override
         public void onClick(View v) {
             int adapterPosition = getAdapterPosition();
-            Trailer trailer = trailers.get(adapterPosition);
+            String trailer = trailers.get(adapterPosition);
             trailerAdapterOnClickHandler.onClick(trailer);
         }
+    }
+
+    public void setTrailers(Trailer trailer) {
+        List<String> youTubeTrailers = new ArrayList<>();
+        for (Trailer.Youtube youtube: trailer.getYoutubeVideos()) {
+            youTubeTrailers.add(youtube.getSource());
+        }
+        this.trailers = youTubeTrailers;
+        notifyDataSetChanged();
     }
 }

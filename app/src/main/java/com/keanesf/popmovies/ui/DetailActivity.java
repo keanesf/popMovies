@@ -3,8 +3,10 @@ package com.keanesf.popmovies.ui;
 import android.arch.persistence.room.Room;
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.provider.SyncStateContract;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -24,8 +26,11 @@ import com.keanesf.popmovies.data.database.PopMoviesDatabase;
 import com.keanesf.popmovies.models.Movie;
 import com.keanesf.popmovies.models.Review;
 import com.keanesf.popmovies.models.TmdbResponse;
+import com.keanesf.popmovies.models.Trailer;
 import com.keanesf.popmovies.utilities.ReviewAdapter;
 import com.keanesf.popmovies.utilities.ReviewService;
+import com.keanesf.popmovies.utilities.TrailerAdapter;
+import com.keanesf.popmovies.utilities.TrailerService;
 import com.squareup.picasso.Picasso;
 
 import java.io.IOException;
@@ -34,7 +39,7 @@ import java.util.List;
 
 import retrofit2.Call;
 
-public class DetailActivity extends AppCompatActivity {
+public class DetailActivity extends AppCompatActivity implements TrailerAdapter.TrailerAdapterOnClickHandler {
 
     private ScrollView detailLayout;
     private ImageView imageView;
@@ -44,7 +49,12 @@ public class DetailActivity extends AppCompatActivity {
     private TextView voteAverageView;
     private PopMoviesDatabase popMoviesDatabase;
     private RecyclerView reviewRecyclerView;
+    private RecyclerView trailerRecyclerView;
     private ReviewAdapter reviewAdapter;
+    private TrailerAdapter trailerAdapter;
+
+    public static final String YOUTUBE_BASE_URL = "http://www.youtube.com/watch?v=";
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -112,6 +122,8 @@ public class DetailActivity extends AppCompatActivity {
                     }
                 });
 
+                // Review Recycler View
+
                 reviewRecyclerView = (RecyclerView) findViewById(R.id.reviewRecyclerView);
 
                 LinearLayoutManager layoutManager = new LinearLayoutManager(this);
@@ -122,6 +134,19 @@ public class DetailActivity extends AppCompatActivity {
 
                 loadReviewData(movie.getId());
 
+                // Trailer Recycler View
+
+                trailerRecyclerView = (RecyclerView) findViewById(R.id.trailerRecyclerView);
+                LinearLayoutManager trailerLayoutManager = new LinearLayoutManager(this);
+                trailerRecyclerView.setLayoutManager(trailerLayoutManager);
+                trailerAdapter = new TrailerAdapter(this);
+                trailerRecyclerView.setAdapter(trailerAdapter);
+
+                loadTrailerData(movie.getId());
+
+
+
+
             }
             else {
                 detailLayout.setVisibility(View.INVISIBLE);
@@ -131,6 +156,10 @@ public class DetailActivity extends AppCompatActivity {
 
     private void loadReviewData(Long movieId){
         new FetchReviewsTask().execute(movieId.toString());
+    }
+
+    private void loadTrailerData(Long movieId){
+        new FetchTrailersTask().execute(movieId.toString());
     }
 
     public class FetchReviewsTask extends AsyncTask<String, Void, List<Review>> {
@@ -165,5 +194,44 @@ public class DetailActivity extends AppCompatActivity {
                 }
             }
         }
+    }
+
+    public class FetchTrailersTask extends AsyncTask<String, Void, Trailer>{
+
+        private final String LOG_TAG = FetchTrailersTask.class.getSimpleName();
+
+        @Override
+        protected Trailer doInBackground(String... params) {
+
+            if (params.length == 0) {
+                return null;
+            }
+
+            TrailerService trailerService = TrailerService.retrofit.create(TrailerService.class);
+
+            try {
+                Call<Trailer> apiCall = trailerService.getTrailers(params[0], BuildConfig.API_KEY);
+                return apiCall.execute().body();
+            } catch (IOException e) {
+                Log.e(LOG_TAG, "Error ", e);
+                return null;
+            }
+
+        }
+
+        @Override
+        protected void onPostExecute(Trailer trailer) {
+            if (trailerAdapter != null) {
+                trailerAdapter.setTrailers(trailer);
+            }
+        }
+
+    }
+
+    @Override
+    public void onClick(String trailer) {
+        Intent videoIntent = new Intent(
+                Intent.ACTION_VIEW, Uri.parse( YOUTUBE_BASE_URL + trailer));
+        startActivity(videoIntent);
     }
 }
