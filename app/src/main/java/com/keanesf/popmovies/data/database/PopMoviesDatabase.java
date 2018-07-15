@@ -29,7 +29,7 @@ import android.util.Log;
  */
 
 // List of the entry classes and associated TypeConverters
-@Database(entities = {FavoriteEntry.class}, version = 2)
+@Database(entities = {FavoriteEntry.class}, version = 3)
 public abstract class PopMoviesDatabase extends RoomDatabase {
 
     private static final String LOG_TAG = PopMoviesDatabase.class.getSimpleName();

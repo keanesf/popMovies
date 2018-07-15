@@ -62,6 +62,13 @@
                         android:layout_width="wrap_content"
                         android:text="@string/mark_favorite" />
 
+                    <Button
+                        android:id="@+id/button_un_fav"
+                        android:layout_height="wrap_content"
+                        android:layout_width="wrap_content"
+                        android:text="@string/un_mark_favorite"
+                        android:visibility="gone" />
+
                 </LinearLayout>
         </RelativeLayout>
 

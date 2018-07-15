@@ -86,23 +86,27 @@ public class DetailActivity extends AppCompatActivity implements TrailerAdapter.
                 titleView.setText(movie.getTitle());
                 overviewView.setText(movie.getOverview());
 
-                String movie_date = movie.getReleaseDate();
-
-                SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
-                try {
-                    String date = DateUtils.formatDateTime(this, formatter.parse(movie_date).getTime(), DateUtils.FORMAT_SHOW_DATE | DateUtils.FORMAT_SHOW_YEAR);
-                    dateView.setText(date);
-                } catch (java.text.ParseException e) {
-                    e.printStackTrace();
+                if(movie.getReleaseDate() != null){
+                    SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+                    try {
+                        String date = DateUtils.formatDateTime(this, formatter.parse(movie.getReleaseDate()).getTime(), DateUtils.FORMAT_SHOW_DATE | DateUtils.FORMAT_SHOW_YEAR);
+                        dateView.setText(date);
+                    } catch (java.text.ParseException e) {
+                        e.printStackTrace();
+                    }
                 }
 
                 voteAverageView.setText(movie.getVoteAverage() + "/10");
 
                 final Button button = findViewById(R.id.button_id);
+                final Button unFavButton = findViewById(R.id.button_un_fav);
                 button.setOnClickListener(new View.OnClickListener() {
                     public void onClick(View v) {
                         final FavoriteEntry favoriteEntry = new FavoriteEntry(
-                                movie.getId(), movie.getPosterPath());
+                                movie.getId(), movie.getPosterPath(), movie.getTitle(),
+                                movie.getOverview(), movie.getReleaseDate(),
+                                movie.getVoteAverage());
+
                         AppExecutors.getInstance().diskIO().execute(new Runnable() {
                             @Override
                             public void run() {
@@ -112,13 +116,15 @@ public class DetailActivity extends AppCompatActivity implements TrailerAdapter.
                         });
 
 
-                        // Code here executes on main thread after user presses button
-                        Context context = getApplicationContext();
-                        CharSequence text = "Favorite saved!";
-                        int duration = Toast.LENGTH_SHORT;
-
-                        Toast toast = Toast.makeText(context, text, duration);
-                        toast.show();
+                        // Code here executes on main thread after user presses favorite button
+                        button.setVisibility(View.GONE);
+                        unFavButton.setVisibility(View.VISIBLE);
+//                        Context context = getApplicationContext();
+//                        CharSequence text = "Favorite saved!";
+//                        int duration = Toast.LENGTH_SHORT;
+//
+//                        Toast toast = Toast.makeText(context, text, duration);
+//                        toast.show();
                     }
                 });
 

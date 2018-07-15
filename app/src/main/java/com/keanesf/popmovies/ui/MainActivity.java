@@ -218,7 +218,9 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
                     List<Movie> movies = new ArrayList<>();
                     // convert favorites to movies
                     for(FavoriteEntry favoriteEntry: favoriteEntries){
-                        Movie movie = new Movie(favoriteEntry.getId(), favoriteEntry.getPosterPath());
+                        Movie movie = new Movie(favoriteEntry.getId(), favoriteEntry.getVoteAverage(),
+                                favoriteEntry.getTitle(), favoriteEntry.getPosterPath(),
+                                favoriteEntry.getOverview(), favoriteEntry.getReleaseDate());
                         movies.add(movie);
                     }
                     return movies;
