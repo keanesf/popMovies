@@ -46,6 +46,7 @@ public class DetailActivity extends AppCompatActivity implements TrailerAdapter.
     private TextView titleView;
     private TextView overviewView;
     private TextView dateView;
+    private TextView reviewHeader;
     private TextView voteAverageView;
     private PopMoviesDatabase popMoviesDatabase;
     private RecyclerView reviewRecyclerView;
@@ -67,6 +68,7 @@ public class DetailActivity extends AppCompatActivity implements TrailerAdapter.
         dateView = (TextView) findViewById(R.id.detail_date);
         voteAverageView = (TextView) findViewById(R.id.detail_vote_average);
         detailLayout = (ScrollView) findViewById(R.id.detail_layout);
+        reviewHeader = findViewById(R.id.reviewHeaderTextView);
 
         popMoviesDatabase = PopMoviesDatabase.getInstance(this);
 
@@ -98,8 +100,23 @@ public class DetailActivity extends AppCompatActivity implements TrailerAdapter.
 
                 voteAverageView.setText(movie.getVoteAverage() + "/10");
 
+
                 final Button button = findViewById(R.id.button_id);
                 final Button unFavButton = findViewById(R.id.button_un_fav);
+
+                AppExecutors.getInstance().diskIO().execute(new Runnable() {
+                    @Override
+                    public void run() {
+                        FavoriteEntry favoriteEntry =
+                                popMoviesDatabase.favoriteDao().getById(movie.getId());
+                        if(favoriteEntry != null){
+                            button.setVisibility(View.GONE);
+                            unFavButton.setVisibility(View.VISIBLE);
+                        }
+
+                    }
+                });
+
                 button.setOnClickListener(new View.OnClickListener() {
                     public void onClick(View v) {
                         final FavoriteEntry favoriteEntry = new FavoriteEntry(
@@ -111,7 +128,6 @@ public class DetailActivity extends AppCompatActivity implements TrailerAdapter.
                             @Override
                             public void run() {
                                 popMoviesDatabase.favoriteDao().insert(favoriteEntry);
-                                finish();
                             }
                         });
 
@@ -119,12 +135,25 @@ public class DetailActivity extends AppCompatActivity implements TrailerAdapter.
                         // Code here executes on main thread after user presses favorite button
                         button.setVisibility(View.GONE);
                         unFavButton.setVisibility(View.VISIBLE);
-//                        Context context = getApplicationContext();
-//                        CharSequence text = "Favorite saved!";
-//                        int duration = Toast.LENGTH_SHORT;
-//
-//                        Toast toast = Toast.makeText(context, text, duration);
-//                        toast.show();
+                    }
+                });
+
+                unFavButton.setOnClickListener(new View.OnClickListener() {
+                    public void onClick(View v) {
+
+                        AppExecutors.getInstance().diskIO().execute(new Runnable() {
+                            @Override
+                            public void run() {
+                                FavoriteEntry favoriteEntry =
+                                        popMoviesDatabase.favoriteDao().getById(movie.getId());
+                                popMoviesDatabase.favoriteDao().delete(favoriteEntry);
+                            }
+                        });
+
+
+                        // Code here executes on main thread after user presses favorite button
+                        button.setVisibility(View.VISIBLE);
+                        unFavButton.setVisibility(View.INVISIBLE);
                     }
                 });
 
@@ -149,9 +178,6 @@ public class DetailActivity extends AppCompatActivity implements TrailerAdapter.
                 trailerRecyclerView.setAdapter(trailerAdapter);
 
                 loadTrailerData(movie.getId());
-
-
-
 
             }
             else {
@@ -196,7 +222,10 @@ public class DetailActivity extends AppCompatActivity implements TrailerAdapter.
         protected void onPostExecute(List<Review> reviews) {
             if (reviews != null) {
                 if (reviewAdapter != null) {
-                    reviewAdapter.setReviews(reviews);
+                    if(reviews != null && reviews.size() > 0)
+                        reviewAdapter.setReviews(reviews);
+                    else
+                        reviewHeader.setVisibility(View.GONE);
                 }
             }
         }
