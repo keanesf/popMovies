@@ -5,9 +5,13 @@ import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
+import android.os.Parcel;
+import android.os.Parcelable;
+import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.Menu;
@@ -47,6 +51,7 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
     private static final String MOVIES_KEY = "movies";
     private String sortBy = POPULARITY_DESC;
     private PopMoviesDatabase popMoviesDatabase;
+    private static final String BUNDLE_RECYCLER_LAYOUT = "MainActivity.recycler.layout";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -145,7 +150,20 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
             outState.putParcelableArrayList(MOVIES_KEY, movies);
         }
         super.onSaveInstanceState(outState);
+        outState.putParcelable(BUNDLE_RECYCLER_LAYOUT, recyclerView.getLayoutManager().onSaveInstanceState());
     }
+
+
+//    @Override
+//    public void onViewStateRestored(@Nullable Bundle savedInstanceState) {
+//        super.onViewStateRestored(savedInstanceState);
+//
+//        if(savedInstanceState != null)
+//        {
+//            Parcelable savedRecyclerLayoutState = savedInstanceState.getParcelable(BUNDLE_RECYCLER_LAYOUT);
+//            recyclerView.getLayoutManager().onRestoreInstanceState(savedRecyclerLayoutState);
+//        }
+//    }
 
     private void loadMovieData(String sortBy){
         if(isOnline()){
@@ -256,4 +274,5 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
         movieDetailIntent.putExtra("movie", movie);
         startActivity(movieDetailIntent);
     }
+
 }

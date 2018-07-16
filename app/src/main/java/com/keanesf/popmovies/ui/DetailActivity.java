@@ -160,10 +160,9 @@ public class DetailActivity extends AppCompatActivity implements TrailerAdapter.
                 // Review Recycler View
 
                 reviewRecyclerView = (RecyclerView) findViewById(R.id.reviewRecyclerView);
-
                 LinearLayoutManager layoutManager = new LinearLayoutManager(this);
                 reviewRecyclerView.setLayoutManager(layoutManager);
-
+                reviewRecyclerView.setHasFixedSize(true);
                 reviewAdapter = new ReviewAdapter();
                 reviewRecyclerView.setAdapter(reviewAdapter);
 
@@ -174,6 +173,7 @@ public class DetailActivity extends AppCompatActivity implements TrailerAdapter.
                 trailerRecyclerView = (RecyclerView) findViewById(R.id.trailerRecyclerView);
                 LinearLayoutManager trailerLayoutManager = new LinearLayoutManager(this);
                 trailerRecyclerView.setLayoutManager(trailerLayoutManager);
+                trailerRecyclerView.setHasFixedSize(true);
                 trailerAdapter = new TrailerAdapter(this);
                 trailerRecyclerView.setAdapter(trailerAdapter);
 

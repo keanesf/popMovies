@@ -87,11 +87,23 @@
 
         </LinearLayout>
 
+        <TextView
+            android:id="@+id/trailerHeaderTextView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="24dp"
+            android:layout_marginRight="24dp"
+            android:paddingBottom="24dp"
+            android:text="@string/trailers"
+            android:textAllCaps="true"/>
+
         <android.support.v7.widget.RecyclerView
             android:id="@+id/trailerRecyclerView"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center" />
+            android:layout_height="360dp"
+            android:layout_below="@id/trailerHeaderTextView"
+            android:paddingBottom="64dp"
+            />
 
         <TextView
             android:id="@+id/reviewHeaderTextView"
