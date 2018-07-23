@@ -1,5 +1,7 @@
 package com.keanesf.popmovies.ui;
 
+import android.arch.lifecycle.LiveData;
+import android.arch.lifecycle.Observer;
 import android.content.Context;
 import android.content.Intent;
 import android.net.ConnectivityManager;
@@ -166,7 +168,26 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
     private void loadMovieData(String sortBy){
         if(isOnline()){
             showMovieDataView();
-            new FetchMoviesTask().execute(sortBy);
+            if (FAVORITE_DESC.equals(sortBy)){
+                LiveData<List<FavoriteEntry>> favoriteEntries = popMoviesDatabase.favoriteDao().getAll();
+                favoriteEntries.observe(this, new Observer<List<FavoriteEntry>>(){
+                    public void onChanged(@Nullable List<FavoriteEntry> favoriteEntries) {
+                        Log.d(LOG_TAG, "Receiving database update from LiveData");
+                        // convert favorites to movies
+                        List<Movie> movies = new ArrayList<>();
+                        for(FavoriteEntry favoriteEntry: favoriteEntries){
+                            Movie movie = new Movie(favoriteEntry.getId(), favoriteEntry.getVoteAverage(),
+                                    favoriteEntry.getTitle(), favoriteEntry.getPosterPath(),
+                                    favoriteEntry.getOverview(), favoriteEntry.getReleaseDate());
+                            movies.add(movie);
+                        }
+                        showMovieDataView();
+                        movieAdapter.setMovies(movies);
+                    }
+                } );
+            }
+            else
+                new FetchMoviesTask().execute(sortBy);
         }
         else {
             mErrorMessageDisplay.setVisibility(View.VISIBLE);
@@ -229,19 +250,7 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
                 } else if (RATING_DESC.equals(params[0])) {
                     Call<TmdbResponse<Movie>> apiCall = movieDbService.listTopMovies(BuildConfig.API_KEY);
                     return apiCall.execute().body().getResults();
-                } else if (FAVORITE_DESC.equals(params[0])){
-                    List<FavoriteEntry> favoriteEntries = popMoviesDatabase.favoriteDao().getAll();
-                    List<Movie> movies = new ArrayList<>();
-                    // convert favorites to movies
-                    for(FavoriteEntry favoriteEntry: favoriteEntries){
-                        Movie movie = new Movie(favoriteEntry.getId(), favoriteEntry.getVoteAverage(),
-                                favoriteEntry.getTitle(), favoriteEntry.getPosterPath(),
-                                favoriteEntry.getOverview(), favoriteEntry.getReleaseDate());
-                        movies.add(movie);
-                    }
-                    return movies;
-                }
-                else {
+                } else {
                     return null;
                 }
             } catch (IOException e) {
