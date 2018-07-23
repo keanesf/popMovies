@@ -52,6 +52,7 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
     private String sortBy = POPULARITY_DESC;
     private PopMoviesDatabase popMoviesDatabase;
     private static final String BUNDLE_RECYCLER_LAYOUT = "MainActivity.recycler.layout";
+    private final String LOG_TAG = this.getClass().getSimpleName();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -79,7 +80,8 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
         mLoadingIndicator = (ProgressBar) findViewById(R.id.pb_loading_indicator);
 
         /* Once all of our views are setup, we can load the movie data. */
-        loadMovieData(sortBy);
+        if(savedInstanceState == null)
+            loadMovieData(sortBy);
 
     }
 
@@ -143,27 +145,23 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
-        if (!sortBy.contentEquals(POPULARITY_DESC)) {
-            outState.putString(SORT_SETTING_KEY, sortBy);
-        }
-        if (movies != null) {
-            outState.putParcelableArrayList(MOVIES_KEY, movies);
-        }
-        super.onSaveInstanceState(outState);
+        outState.putString(SORT_SETTING_KEY, sortBy);
+        outState.putParcelableArrayList(MOVIES_KEY, movies);
         outState.putParcelable(BUNDLE_RECYCLER_LAYOUT, recyclerView.getLayoutManager().onSaveInstanceState());
+        super.onSaveInstanceState(outState);
     }
 
-
-//    @Override
-//    public void onViewStateRestored(@Nullable Bundle savedInstanceState) {
-//        super.onViewStateRestored(savedInstanceState);
-//
-//        if(savedInstanceState != null)
-//        {
-//            Parcelable savedRecyclerLayoutState = savedInstanceState.getParcelable(BUNDLE_RECYCLER_LAYOUT);
-//            recyclerView.getLayoutManager().onRestoreInstanceState(savedRecyclerLayoutState);
-//        }
-//    }
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        if (savedInstanceState != null) {
+            Parcelable savedRecyclerLayoutState = savedInstanceState.getParcelable(BUNDLE_RECYCLER_LAYOUT);
+            sortBy = savedInstanceState.getString(SORT_SETTING_KEY);
+            movies = savedInstanceState.getParcelableArrayList(MOVIES_KEY);
+            recyclerView.getLayoutManager().onRestoreInstanceState(savedRecyclerLayoutState);
+            loadMovieData(sortBy);
+        }
+    }
 
     private void loadMovieData(String sortBy){
         if(isOnline()){
