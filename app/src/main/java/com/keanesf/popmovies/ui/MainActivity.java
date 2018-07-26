@@ -55,6 +55,7 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
     private PopMoviesDatabase popMoviesDatabase;
     private static final String BUNDLE_RECYCLER_LAYOUT = "MainActivity.recycler.layout";
     private final String LOG_TAG = this.getClass().getSimpleName();
+    Parcelable listState;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -147,20 +148,19 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
         outState.putString(SORT_SETTING_KEY, sortBy);
         outState.putParcelableArrayList(MOVIES_KEY, movies);
         outState.putParcelable(BUNDLE_RECYCLER_LAYOUT, recyclerView.getLayoutManager().onSaveInstanceState());
-        super.onSaveInstanceState(outState);
     }
 
     @Override
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
         if (savedInstanceState != null) {
-            Parcelable savedRecyclerLayoutState = savedInstanceState.getParcelable(BUNDLE_RECYCLER_LAYOUT);
+            listState = savedInstanceState.getParcelable(BUNDLE_RECYCLER_LAYOUT);
             sortBy = savedInstanceState.getString(SORT_SETTING_KEY);
             movies = savedInstanceState.getParcelableArrayList(MOVIES_KEY);
-            recyclerView.getLayoutManager().onRestoreInstanceState(savedRecyclerLayoutState);
             loadMovieData(sortBy);
         }
     }
@@ -280,6 +280,14 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
         Intent movieDetailIntent = new Intent(MainActivity.this, DetailActivity.class);
         movieDetailIntent.putExtra("movie", movie);
         startActivity(movieDetailIntent);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (listState != null) {
+            recyclerView.getLayoutManager().onRestoreInstanceState(listState);
+        }
     }
 
 }
