@@ -150,7 +150,7 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putString(SORT_SETTING_KEY, sortBy);
-        outState.putParcelableArrayList(MOVIES_KEY, movies);
+        outState.putParcelableArrayList(MOVIES_KEY, new ArrayList<Parcelable>(movieAdapter.getMovies()));
         outState.putParcelable(BUNDLE_RECYCLER_LAYOUT, recyclerView.getLayoutManager().onSaveInstanceState());
     }
 
@@ -161,7 +161,7 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
             listState = savedInstanceState.getParcelable(BUNDLE_RECYCLER_LAYOUT);
             sortBy = savedInstanceState.getString(SORT_SETTING_KEY);
             movies = savedInstanceState.getParcelableArrayList(MOVIES_KEY);
-            loadMovieData(sortBy);
+            movieAdapter.setMovies(movies);
         }
     }
 
