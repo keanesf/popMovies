@@ -2,6 +2,7 @@ package com.keanesf.popmovies.ui;
 
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.Observer;
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.Intent;
 import android.net.ConnectivityManager;
@@ -25,6 +26,7 @@ import android.widget.TextView;
 
 import com.keanesf.popmovies.BuildConfig;
 import com.keanesf.popmovies.data.database.FavoriteEntry;
+import com.keanesf.popmovies.data.database.FavoriteListViewModel;
 import com.keanesf.popmovies.data.database.PopMoviesDatabase;
 import com.keanesf.popmovies.utilities.MovieAdapter;
 import com.keanesf.popmovies.R;
@@ -56,6 +58,7 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
     private static final String BUNDLE_RECYCLER_LAYOUT = "MainActivity.recycler.layout";
     private final String LOG_TAG = this.getClass().getSimpleName();
     Parcelable listState;
+    private FavoriteListViewModel viewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -170,7 +173,10 @@ public class MainActivity extends AppCompatActivity implements MovieAdapter.Movi
             showMovieDataView();
             if (FAVORITE_DESC.equals(sortBy)){
                 LiveData<List<FavoriteEntry>> favoriteEntries = popMoviesDatabase.favoriteDao().getAll();
-                favoriteEntries.observe(this, new Observer<List<FavoriteEntry>>(){
+
+                viewModel = ViewModelProviders.of(this).get(FavoriteListViewModel.class);
+
+                viewModel.getFavoriteEntries().observe(this, new Observer<List<FavoriteEntry>>(){
                     public void onChanged(@Nullable List<FavoriteEntry> favoriteEntries) {
                         Log.d(LOG_TAG, "Receiving database update from LiveData");
                         // convert favorites to movies
